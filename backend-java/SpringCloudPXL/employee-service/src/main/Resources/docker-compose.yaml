@@ -1,0 +1,34 @@
+name: java_mysql
+
+services:
+    
+    java_mysql:
+        image: mysql:8.3
+        container_name: java_mySql_container
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: "root"
+            MYSQL_USER: "user"
+            MYSQL_PASSWORD: "password"
+            MYSQL_DATABASE: "employeeservice_db"
+        networks: 
+            - java_network
+        volumes:
+            - java_mysql_volume:/var/lib/mysql
+        
+    phpmyadmin:
+        image: phpmyadmin
+        container_name: java_phpmyadmin_container
+        ports:
+            - "8085:80"
+        environment:
+            PMA_HOST: java_mySql_container
+        networks:
+            - java_network
+
+networks:
+    java_network:
+
+volumes:
+    java_mysql_volume:

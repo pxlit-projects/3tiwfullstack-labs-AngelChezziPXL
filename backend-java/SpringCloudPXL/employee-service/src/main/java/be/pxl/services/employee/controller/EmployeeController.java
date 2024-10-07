@@ -19,7 +19,7 @@ public class EmployeeController {
     private final IEmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<List<Employee>> getEmployees() {
+    public ResponseEntity getEmployees() {
         return new ResponseEntity(employeeService.getAllEmployees(), HttpStatus.OK);
     }
 }
