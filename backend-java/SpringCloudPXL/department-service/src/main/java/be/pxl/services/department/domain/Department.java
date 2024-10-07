@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import java.util.Collections;
 import java.util.List;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 @Entity
 @Table(name = "department")
@@ -22,7 +21,8 @@ public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Long organisationId;
+    private Long organizationId;
     private String name;
     private List<Employee> employees = Collections.emptyList();
+    private String position;
 }

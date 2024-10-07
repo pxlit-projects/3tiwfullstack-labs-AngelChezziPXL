@@ -9,6 +9,7 @@ public interface IDepartmentService {
     List<DepartmentResponse> findAll();
     DepartmentResponse findById(Long id);
     List<DepartmentResponse> findAllByOrganizationId(Long organizationId);
+    List<DepartmentResponse> findAllByOrganizationWithEmployees(Long organizationId);
 
     void addDepartment(DepartmentRequest departmentRequest);
 
