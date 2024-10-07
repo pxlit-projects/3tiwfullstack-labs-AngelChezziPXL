@@ -26,7 +26,7 @@ public class EmployeeService implements IEmployeeService {
         return EmployeeResponse.builder()
                 .age(employee.getAge())
                 .name(employee.getName())
-                .organisationId(employee.getOrganisationId())
+                .organizationId(employee.getOrganizationId())
                 .departmentId(employee.getDepartmentId())
                 .position(employee.getPosition())
                 .build();
@@ -37,7 +37,7 @@ public class EmployeeService implements IEmployeeService {
         Employee employee = Employee.builder()
                 .age(employeeRequest.getAge())
                 .name(employeeRequest.getName())
-                .organisationId(employeeRequest.getOrganisationId())
+                .organizationId(employeeRequest.getOrganizationId())
                 .departmentId(employeeRequest.getDepartmentId())
                 .position(employeeRequest.getPosition())
                 .build();
@@ -57,8 +57,8 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public List<EmployeeResponse> findByOrganisationId(Long organizationId) {
-        List<Employee> employees = employeeRepository.findAllByOrganisationId(organizationId).orElseThrow(() -> new NotFoundException("Employee with organisation id " + organizationId + " not found!"));
+    public List<EmployeeResponse> findByOrganizationId(Long organizationId) {
+        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId).orElseThrow(() -> new NotFoundException("Employee with organisation id " + organizationId + " not found!"));
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 

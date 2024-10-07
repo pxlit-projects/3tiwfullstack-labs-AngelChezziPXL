@@ -38,7 +38,7 @@ public class EmployeeController {
 
     @GetMapping("/organization/{organizationId}")
     public ResponseEntity getEmployeeByOrganizationId (@PathVariable Long organizationId) {
-        return new ResponseEntity(employeeService.findByOrganisationId(organizationId), HttpStatus.OK);
+        return new ResponseEntity(employeeService.findByOrganizationId(organizationId), HttpStatus.OK);
     }
 
 

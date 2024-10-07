@@ -14,5 +14,5 @@ public interface IEmployeeService {
 
     List<EmployeeResponse> findByDepartmentId(Long departmentId);
 
-    List<EmployeeResponse> findByOrganisationId(Long organizationId);
+    List<EmployeeResponse> findByOrganizationId(Long organizationId);
 }
