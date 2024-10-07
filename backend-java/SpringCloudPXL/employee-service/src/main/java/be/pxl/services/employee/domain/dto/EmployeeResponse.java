@@ -1,21 +1,15 @@
-package be.pxl.services.employee.domain;
+package be.pxl.services.employee.domain.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name="employee")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employee {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
+public class EmployeeResponse {
     private Long organisationId;
     private Long departmentId;
     private String name;
