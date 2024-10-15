@@ -23,6 +23,7 @@ public class Department {
     private Long id;
     private Long organizationId;
     private String name;
+    @Transient
     private List<Employee> employees = Collections.emptyList();
     private String position;
 }

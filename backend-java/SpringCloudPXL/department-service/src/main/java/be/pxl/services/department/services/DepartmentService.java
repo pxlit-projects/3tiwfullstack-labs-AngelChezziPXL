@@ -5,10 +5,11 @@ import be.pxl.services.department.domain.dto.DepartmentRequest;
 import be.pxl.services.department.domain.dto.DepartmentResponse;
 import be.pxl.services.department.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +19,39 @@ public class DepartmentService implements IDepartmentService {
     @Override
     public List<DepartmentResponse> findAll() {
         List<Department> departments = departmentRepository.findAll();
-        return departments.stream().map(this::mapToDepartment).toList();
+        return departments.stream().map(this::mapToDepartmentResponse).toList();
     }
 
     @Override
     public DepartmentResponse findById(Long id) {
-        Department department = departmentRepository.findById(id).orElse(null);
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        return mapToDepartmentResponse(department);
+    }
+
+    @Override
+    public List<DepartmentResponse> findAllByOrganizationId(Long organizationId) {
+        List<Department> departments = departmentRepository.findAllByOrganizationId(organizationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        return departments.stream().map(this::mapToDepartmentResponse).toList();
+    }
+
+    @Override
+    public List<DepartmentResponse> findAllByOrganizationWithEmployees(Long organizationId) {
+        List<Department> departments = departmentRepository.findAllWithEmployeesByOrganizationId(organizationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        return  departments.stream().map((this::mapToDepartmentResponse)).toList();
+    }
+
+    @Override
+    public void addDepartment(DepartmentRequest departmentRequest) {
+        Department department = mapToDepartment(departmentRequest);
+        departmentRepository.save(department);
+    }
+
+    private DepartmentResponse mapToDepartmentResponse(Department department) {
         return DepartmentResponse.builder()
+                .id(department.getId())
                 .organizationId(department.getOrganizationId())
                 .name(department.getName())
                 .employees(department.getEmployees())
@@ -32,27 +59,12 @@ public class DepartmentService implements IDepartmentService {
                 .build();
     }
 
-    @Override
-    public List<DepartmentResponse> findAllByOrganizationId(Long organizationId) {
-        return List.of();
-    }
-
-    @Override
-    public List<DepartmentResponse> findAllByOrganizationWithEmployees(Long organizationId) {
-        return List.of();
-    }
-
-    @Override
-    public void addDepartment(DepartmentRequest departmentRequest) {
-
-    }
-
-    private DepartmentResponse mapToDepartment(Department department) {
-        return DepartmentResponse.builder()
-                .organizationId(department.getOrganizationId())
-                .name(department.getName())
-                .employees(department.getEmployees())
-                .position(department.getPosition())
+    private Department mapToDepartment(DepartmentRequest departmentRequest) {
+        return Department.builder()
+                .organizationId(departmentRequest.getOrganizationId())
+                .name(departmentRequest.getName())
+                .employees(departmentRequest.getEmployees())
+                .position(departmentRequest.getPosition())
                 .build();
     }
 }
