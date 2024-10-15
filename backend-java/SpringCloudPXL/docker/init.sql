@@ -1,0 +1,2 @@
+-- CREATE DATABASE IF NOT EXISTS employeeservice_db;
+-- CREATE DATABASE IF NOT EXISTS departmentservice_db;

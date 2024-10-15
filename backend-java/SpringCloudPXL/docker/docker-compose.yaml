@@ -11,10 +11,11 @@ services:
             MYSQL_ROOT_PASSWORD: "root"
             MYSQL_USER: "user"
             MYSQL_PASSWORD: "password"
-            MYSQL_DATABASE: "employeeservice_db"
+            #MYSQL_DATABASE: "employeeservice_db"
         networks: 
             - java_network
         volumes:
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
             - java_mysql_volume:/var/lib/mysql
         
     phpmyadmin:
