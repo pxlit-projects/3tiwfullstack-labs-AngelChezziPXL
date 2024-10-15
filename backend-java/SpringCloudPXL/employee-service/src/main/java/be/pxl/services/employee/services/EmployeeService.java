@@ -1,12 +1,13 @@
 package be.pxl.services.employee.services;
 
-import be.pxl.services.employee.Exceptions.NotFoundException;
 import be.pxl.services.employee.domain.Employee;
 import be.pxl.services.employee.domain.dto.EmployeeRequest;
 import be.pxl.services.employee.domain.dto.EmployeeResponse;
 import be.pxl.services.employee.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -46,19 +47,19 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public EmployeeResponse findEmployeeById(Long id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("Employee with id " + id + " not found!"));
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee with id " + id + " not found!"));
         return mapToEmployeeResponse(employee);
     }
 
     @Override
     public List<EmployeeResponse> findByDepartmentId(Long departmentId) {
-        List<Employee> employees = employeeRepository.findAllByDepartmentId(departmentId).orElseThrow(() -> new NotFoundException("Employee with department id " + departmentId + " not found!"));
+        List<Employee> employees = employeeRepository.findAllByDepartmentId(departmentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with department id " + departmentId + " not found!"));
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
     @Override
     public List<EmployeeResponse> findByOrganizationId(Long organizationId) {
-        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId).orElseThrow(() -> new NotFoundException("Employee with organisation id " + organizationId + " not found!"));
+        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with organisation id " + organizationId + " not found!"));
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
