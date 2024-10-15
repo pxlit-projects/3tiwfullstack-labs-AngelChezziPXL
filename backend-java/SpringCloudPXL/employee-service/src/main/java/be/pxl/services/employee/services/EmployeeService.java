@@ -47,19 +47,22 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public EmployeeResponse findEmployeeById(Long id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee with id " + id + " not found!"));
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee with id " + id + " not found!"));
         return mapToEmployeeResponse(employee);
     }
 
     @Override
     public List<EmployeeResponse> findByDepartmentId(Long departmentId) {
-        List<Employee> employees = employeeRepository.findAllByDepartmentId(departmentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with department id " + departmentId + " not found!"));
+        List<Employee> employees = employeeRepository.findAllByDepartmentId(departmentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with department id " + departmentId + " not found!"));
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
     @Override
     public List<EmployeeResponse> findByOrganizationId(Long organizationId) {
-        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with organisation id " + organizationId + " not found!"));
+        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with organisation id " + organizationId + " not found!"));
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
