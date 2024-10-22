@@ -23,17 +23,6 @@ public class EmployeeService implements IEmployeeService {
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
-    private EmployeeResponse mapToEmployeeResponse(Employee employee) {
-        return EmployeeResponse.builder()
-                .id(employee.getId())
-                .name(employee.getName())
-                .age(employee.getAge())
-                .organizationId(employee.getOrganizationId())
-                .departmentId(employee.getDepartmentId())
-                .position(employee.getPosition())
-                .build();
-    }
-
     @Override
     public void addEmployee(EmployeeRequest employeeRequest) {
         Employee employee = Employee.builder()
@@ -67,5 +56,14 @@ public class EmployeeService implements IEmployeeService {
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
-
+    private EmployeeResponse mapToEmployeeResponse(Employee employee) {
+        return EmployeeResponse.builder()
+                .id(employee.getId())
+                .name(employee.getName())
+                .age(employee.getAge())
+                .organizationId(employee.getOrganizationId())
+                .departmentId(employee.getDepartmentId())
+                .position(employee.getPosition())
+                .build();
+    }
 }
