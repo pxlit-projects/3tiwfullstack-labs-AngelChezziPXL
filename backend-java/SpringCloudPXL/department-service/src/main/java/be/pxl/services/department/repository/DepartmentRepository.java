@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
     Optional<List<Department>> findAllByOrganizationId(Long organizationId);
 
-    @Query("SELECT d FROM Department d WHERE d.organization.id = :organizationId AND SIZE(d.employees) > 0")
+    //TODO: Check query. Not working
+    @Query("SELECT d FROM Department d JOIN d.employees e WHERE d.organizationId = :organizationId GROUP BY d HAVING COUNT(e) > 0")
     Optional<List<Department>> findAllWithEmployeesByOrganizationId(Long organizationId);
 }
