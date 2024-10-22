@@ -25,8 +25,9 @@ public class EmployeeService implements IEmployeeService {
 
     private EmployeeResponse mapToEmployeeResponse(Employee employee) {
         return EmployeeResponse.builder()
-                .age(employee.getAge())
+                .id(employee.getId())
                 .name(employee.getName())
+                .age(employee.getAge())
                 .organizationId(employee.getOrganizationId())
                 .departmentId(employee.getDepartmentId())
                 .position(employee.getPosition())
