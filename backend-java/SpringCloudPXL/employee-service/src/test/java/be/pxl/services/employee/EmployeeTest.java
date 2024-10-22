@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.apache.commons.lang3.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,6 +156,16 @@ public class EmployeeTest {
 
         assertEquals(employeeResponse, responseEmployee);
 
+    }
+
+    @Test
+    public void testGetEmployeesByDepartmentId() throws Exception {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void testGetEmployeesByOrganizationId() throws Exception {
+        throw new NotImplementedException();
     }
 
 
