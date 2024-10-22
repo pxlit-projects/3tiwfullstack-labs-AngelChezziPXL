@@ -83,6 +83,8 @@ public class EmployeeTest {
                 .andExpect(status().isCreated());
 
         assertEquals(1, employeeRepository.findAll().size());
+
+        //TODO: add test for wrong entry
     }
 
     @Test
@@ -155,16 +157,23 @@ public class EmployeeTest {
         });
 
         assertEquals(employeeResponse, responseEmployee);
-
+        //TODO: add test for non existing id
     }
 
     @Test
     public void testGetEmployeesByDepartmentId() throws Exception {
+
+        //ToDo: Add test for departments with employees
+        //ToDo: Add test for department without employees
+        //ToDo: Add test for non existing departmentId
         throw new NotImplementedException();
     }
 
     @Test
     public void testGetEmployeesByOrganizationId() throws Exception {
+        //ToDo: Add test for organization with employees
+        //ToDo: Add test for organization without employees
+        //ToDo: Add test for non existing organizationId
         throw new NotImplementedException();
     }
 
