@@ -23,6 +23,8 @@ public class Department {
     private Long id;
     private Long organizationId;
     private String name;
+
+    // TODO: Hoe kan ik deze toevoegen aan de DB zodat de query van de repository kan werken?
     @Transient
     private List<Employee> employees = Collections.emptyList();
     private String position;
