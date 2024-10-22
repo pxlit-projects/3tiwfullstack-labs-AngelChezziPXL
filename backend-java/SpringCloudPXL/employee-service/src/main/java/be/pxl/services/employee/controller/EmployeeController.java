@@ -1,7 +1,6 @@
 package be.pxl.services.employee.controller;
 
 import be.pxl.services.employee.domain.dto.EmployeeRequest;
-import be.pxl.services.employee.domain.dto.EmployeeResponse;
 import be.pxl.services.employee.services.IEmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,12 +31,12 @@ public class EmployeeController {
     }
 
     @GetMapping("/department/{departmentId}")
-    public ResponseEntity getEmployeeByDepartmentId (@PathVariable Long departmentId) {
+    public ResponseEntity getEmployeesByDepartmentId(@PathVariable Long departmentId) {
         return new ResponseEntity(employeeService.findByDepartmentId(departmentId), HttpStatus.OK);
     }
 
     @GetMapping("/organization/{organizationId}")
-    public ResponseEntity getEmployeeByOrganizationId (@PathVariable Long organizationId) {
+    public ResponseEntity getEmployeesByOrganizationId(@PathVariable Long organizationId) {
         return new ResponseEntity(employeeService.findByOrganizationId(organizationId), HttpStatus.OK);
     }
 
