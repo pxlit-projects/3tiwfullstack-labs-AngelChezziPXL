@@ -1,15 +1,20 @@
 package be.pxl.services.employee;
 
 import be.pxl.services.employee.domain.Employee;
+import be.pxl.services.employee.domain.dto.EmployeeResponse;
 import be.pxl.services.employee.repository.EmployeeRepository;
+import be.pxl.services.employee.services.EmployeeService;
+import be.pxl.services.employee.services.IEmployeeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -40,6 +46,8 @@ public class EmployeeTest {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+//    @MockBean
+//    private IEmployeeService employeeService;
 
     @Container
     private static MySQLContainer sqlContainer = new MySQLContainer("mysql:8.3");
@@ -51,8 +59,16 @@ public class EmployeeTest {
         registry.add("spring.datasource.password", sqlContainer::getPassword);
     }
 
+    @BeforeEach
+    public void setup() {
+        if(!employeeRepository.findAll().isEmpty()) {
+            employeeRepository.deleteAll();
+        }
+    }
+
     @Test
     public  void testCreateEmployee() throws Exception {
+
         Employee employee = Employee.builder()
                 .age(24)
                 .name("Jan")
@@ -71,37 +87,75 @@ public class EmployeeTest {
     @Test
     public  void testGetEmployees() throws Exception {
         List<Employee> seedEmployees = new ArrayList<>();
-        seedEmployees.add(Employee.builder().age(22).name("John").position("student").build());
-        seedEmployees.add(Employee.builder().age(35).name("Piet").position("teacher").build());
-        seedEmployees.add(Employee.builder().age(32).name("Luc").position("teacher").build());
-        seedEmployees.add(Employee.builder().age(21).name("Jef").position("student").build());
-        seedEmployees.add(Employee.builder().age(20).name("Lisa").position("student").build());
+        seedEmployees.add(Employee.builder().id(1L).age(22).name("John").position("student").build());
+        seedEmployees.add(Employee.builder().id(2L).age(35).name("Piet").position("teacher").build());
+        seedEmployees.add(Employee.builder().id(3L).age(32).name("Luc").position("teacher").build());
+        seedEmployees.add(Employee.builder().id(4L).age(21).name("Jef").position("student").build());
+        seedEmployees.add(Employee.builder().id(5L).age(20).name("Lisa").position("student").build());
 
+        employeeRepository.saveAll(seedEmployees);
+
+        List<EmployeeResponse> employeeResponses = new ArrayList<>();
         for (Employee employee : seedEmployees) {
-            addEmployeesToMockDatabase(employee);
+            employeeResponses.add(EmployeeResponse.builder()
+                    .id(employee.getId())
+                    .age(employee.getAge())
+                    .name(employee.getName())
+                    .position(employee.getPosition())
+                    .departmentId(employee.getDepartmentId())
+                    .organizationId(employee.getOrganizationId())
+                    .build()
+            );
         }
+        //TODO: QUESTION: Mag de service gemocked worden of moet de Testcontainer DB gebruikt worden met de repository?
+        //when(employeeService.getAllEmployees()).thenReturn(employeeResponses);
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employees")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
-        List<Employee> responseEmployees = objectMapper.readValue(responseContent, new TypeReference<List<Employee>>() {
+        List<EmployeeResponse> responseEmployees = objectMapper.readValue(responseContent, new TypeReference<List<EmployeeResponse>>() {
         });
 
-        assertEquals(seedEmployees, responseEmployees);
+        assertEquals(employeeResponses, responseEmployees);
+    }
+
+    @Test
+    public  void testGetEmployeeById() throws Exception {
+        List<Employee> seedEmployees = new ArrayList<>();
+        seedEmployees.add(Employee.builder().id(1L).age(22).organizationId(1L).departmentId(1L).name("John").position("student").build());
+        seedEmployees.add(Employee.builder().id(2L).age(35).organizationId(1L).departmentId(1L).name("Piet").position("teacher").build());
+        seedEmployees.add(Employee.builder().id(3L).age(32).organizationId(1L).departmentId(2L).name("Luc").position("teacher").build());
+        seedEmployees.add(Employee.builder().id(4L).age(21).organizationId(2L).departmentId(1L).name("Jef").position("student").build());
+        seedEmployees.add(Employee.builder().id(5L).age(20).name("Lisa").position("student").build());
+
+        employeeRepository.saveAll(seedEmployees);
+        Long employeeId = 3L;
+        Employee employee = seedEmployees.stream().filter(e -> e.getId().equals(employeeId)).findFirst().get();
+
+        EmployeeResponse employeeResponse = EmployeeResponse.builder()
+                .id(employee.getId())
+                .age(employee.getAge())
+                .name(employee.getName())
+                .position(employee.getPosition())
+                .departmentId(employee.getDepartmentId())
+                .organizationId(employee.getOrganizationId())
+                .build();
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + employeeId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        EmployeeResponse responseEmployee = objectMapper.readValue(responseContent, new TypeReference<EmployeeResponse>() {
+        });
+
+        assertEquals(employeeResponse, responseEmployee);
 
     }
 
-    //Helper methods
-    public void addEmployeesToMockDatabase(Employee employee) throws Exception {
-        String employeeString = objectMapper.writeValueAsString(employee);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/employee")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(employeeString))
-                .andExpect(status().isCreated());
-    }
 
 }
