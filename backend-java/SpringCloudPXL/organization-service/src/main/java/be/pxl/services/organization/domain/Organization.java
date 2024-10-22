@@ -25,5 +25,6 @@ public class Organization {
     // TODO: Hoe kan ik deze toevoegen aan de DB zodat de query van de repository kan werken?
     @Transient
     private List<Employee> employees = Collections.emptyList();
+    @Transient
     private List<Department> departments = Collections.emptyList();
 }
