@@ -147,6 +147,7 @@ public class EmployeeTest {
                 .organizationId(employee.getOrganizationId())
                 .build();
 
+        // test for id that exists
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + employeeId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -157,16 +158,47 @@ public class EmployeeTest {
         });
 
         assertEquals(employeeResponse, responseEmployee);
-        //TODO: add test for non existing id
+
+        // test for non existing id
+        Long nonExistingEmployeeId = 99L;
+        MvcResult resultNotExistId = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + nonExistingEmployeeId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        String responseNotExistIdContent = resultNotExistId.getResponse().getErrorMessage();
+        assertEquals("Employee with id " + nonExistingEmployeeId + " not found!", responseNotExistIdContent);
+
     }
 
     @Test
     public void testGetEmployeesByDepartmentId() throws Exception {
+        List<Employee> seedEmployees = new ArrayList<>();
+        seedEmployees.add(Employee.builder().id(1L).age(22).organizationId(1L).departmentId(1L).name("John").position("student").build());
+        seedEmployees.add(Employee.builder().id(2L).age(35).organizationId(1L).departmentId(1L).name("Piet").position("teacher").build());
+        seedEmployees.add(Employee.builder().id(3L).age(32).organizationId(1L).departmentId(2L).name("Luc").position("teacher").build());
+        seedEmployees.add(Employee.builder().id(4L).age(21).organizationId(2L).departmentId(1L).name("Jef").position("student").build());
+        seedEmployees.add(Employee.builder().id(5L).age(20).name("Lisa").position("student").build());
+
+        employeeRepository.saveAll(seedEmployees);
 
         //ToDo: Add test for departments with employees
+        Long departmentId = 1L;
+        List<EmployeeResponse> expectedEmployees = new ArrayList<>();
+        expectedEmployees.add(mapEmployeeToEmployeeResponse(seedEmployees.get(0)));
+        expectedEmployees.add(mapEmployeeToEmployeeResponse(seedEmployees.get(1)));
+        expectedEmployees.add(mapEmployeeToEmployeeResponse(seedEmployees.get(3)));
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/department/" + departmentId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String responseContent = result.getResponse().getContentAsString();
+        List<EmployeeResponse> employeesResponse = objectMapper.readValue(responseContent, new TypeReference<List<EmployeeResponse>>() {});
+        assertEquals(expectedEmployees, employeesResponse);
+
         //ToDo: Add test for department without employees
         //ToDo: Add test for non existing departmentId
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 
     @Test
@@ -177,5 +209,17 @@ public class EmployeeTest {
         throw new NotImplementedException();
     }
 
+
+    //Helper function
+    private EmployeeResponse mapEmployeeToEmployeeResponse(Employee employee) {
+        return EmployeeResponse.builder()
+                .id(employee.getId())
+                .age(employee.getAge())
+                .name(employee.getName())
+                .position(employee.getPosition())
+                .departmentId(employee.getDepartmentId())
+                .organizationId(employee.getOrganizationId())
+                .build();
+    }
 
 }
