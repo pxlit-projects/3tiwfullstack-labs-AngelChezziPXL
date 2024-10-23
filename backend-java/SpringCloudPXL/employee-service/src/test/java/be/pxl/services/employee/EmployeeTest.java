@@ -181,7 +181,7 @@ public class EmployeeTest {
 
         employeeRepository.saveAll(seedEmployees);
 
-        //ToDo: Add test for departments with employees
+        //test for departments with employees
         Long departmentId = 1L;
         List<EmployeeResponse> expectedEmployees = new ArrayList<>();
         expectedEmployees.add(mapEmployeeToEmployeeResponse(seedEmployees.get(0)));
