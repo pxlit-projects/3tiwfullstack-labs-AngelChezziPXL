@@ -49,7 +49,7 @@ public class EmployeeService implements IEmployeeService {
                 //.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with department id " + departmentId + " not found!"));
         //TODO: Check why line with elseThrow is not working
         if(employees.isEmpty() || employees == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No employees with department id " + departmentId + "found!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No employees with department id " + departmentId + " found!");
         }
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
