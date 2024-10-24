@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.org.apache.commons.lang3.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +49,7 @@ public class EmployeeTest {
 //    private IEmployeeService employeeService;
 
     @Container
-    private static MySQLContainer sqlContainer = new MySQLContainer("mysql:8.3");
+    private static MySQLContainer sqlContainer = new MySQLContainer("mysql:5.7");
 
     @DynamicPropertySource
     static void registerDeynamicMySQLProperties(DynamicPropertyRegistry registry) {
