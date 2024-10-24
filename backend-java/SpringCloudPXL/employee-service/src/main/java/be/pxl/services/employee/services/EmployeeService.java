@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,15 +45,22 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public List<EmployeeResponse> findByDepartmentId(Long departmentId) {
-        List<Employee> employees = employeeRepository.findAllByDepartmentId(departmentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with department id " + departmentId + " not found!"));
+        List<Employee> employees = employeeRepository.findAllByDepartmentId(departmentId).orElse(null);
+                //.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with department id " + departmentId + " not found!"));
+        //TODO: Check why line with elseThrow is not working
+        if(employees.isEmpty() || employees == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No employees with department id " + departmentId + "found!");
+        }
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
     @Override
     public List<EmployeeResponse> findByOrganizationId(Long organizationId) {
-        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employees with organisation id " + organizationId + " not found!"));
+        List<Employee> employees = employeeRepository.findAllByOrganizationId(organizationId).orElse(null);
+                //.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No employees found with organisation id " + organizationId + "!"));
+        if(employees.isEmpty() || employees == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No employees found with organisation id " + organizationId + "!");
+        }
         return employees.stream().map(this::mapToEmployeeResponse).toList();
     }
 
