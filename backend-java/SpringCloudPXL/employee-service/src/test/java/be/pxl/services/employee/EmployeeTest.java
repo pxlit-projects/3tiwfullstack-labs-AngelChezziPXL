@@ -194,7 +194,7 @@ public class EmployeeTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
         String responseResultNonExistingDepartmentIdContent = resultNonExistingDepartmentId.getResponse().getErrorMessage();
-        assertEquals("No employees with department id" + nonExistingDepartmentId + " found!", responseResultNonExistingDepartmentIdContent, "A wrong deparmentId should return a Not Found status code!");
+        assertEquals("No employees with department id " + nonExistingDepartmentId + " found!", responseResultNonExistingDepartmentIdContent, "A wrong deparmentId should return a Not Found status code!");
 
     }
 
