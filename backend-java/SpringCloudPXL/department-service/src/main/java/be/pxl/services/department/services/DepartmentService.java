@@ -31,15 +31,21 @@ public class DepartmentService implements IDepartmentService {
 
     @Override
     public List<DepartmentResponse> findAllByOrganizationId(Long organizationId) {
-        List<Department> departments = departmentRepository.findAllByOrganizationId(organizationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        List<Department> departments = departmentRepository.findAllByOrganizationId(organizationId).orElse(null);
+                //.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        if(departments == null || departments.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found");
+        }
         return departments.stream().map(this::mapToDepartmentResponse).toList();
     }
 
     @Override
     public List<DepartmentResponse> findAllByOrganizationWithEmployees(Long organizationId) {
-        List<Department> departments = departmentRepository.findAllWithEmployeesByOrganizationId(organizationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        List<Department> departments = departmentRepository.findAllWithEmployeesByOrganizationId(organizationId).orElse(null);
+                //.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
+        if(departments == null || departments.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found");
+        }
         return  departments.stream().map((this::mapToDepartmentResponse)).toList();
     }
 
