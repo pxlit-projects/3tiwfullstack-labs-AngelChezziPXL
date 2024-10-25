@@ -22,7 +22,7 @@ public class Organization {
     private String name;
     private String address;
 
-    // TODO: Hoe kan ik deze toevoegen aan de DB zodat de query van de repository kan werken?
+    // TODO: QUESTION: Hoe kan ik deze toevoegen aan de DB zodat de query van de repository kan werken en de testen ook kunnen werken?
     @Transient
     private List<Employee> employees = Collections.emptyList();
     @Transient
