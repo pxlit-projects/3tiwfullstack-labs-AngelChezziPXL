@@ -1,7 +1,6 @@
 package be.pxl.services.employee;
 
 import be.pxl.services.employee.domain.Employee;
-import be.pxl.services.employee.domain.dto.EmployeeResponse;
 import be.pxl.services.employee.repository.EmployeeRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,21 +37,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EmployeeTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private EmployeeRepository employeeRepository;
-//    @MockBean
-//    private IEmployeeService employeeService;
 
     @Container
     private static MySQLContainer sqlContainer = new MySQLContainer("mysql:5.7");
 
     @DynamicPropertySource
-    static void registerDeynamicMySQLProperties(DynamicPropertyRegistry registry) {
+    static void registerDynamicMySQLProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", sqlContainer::getJdbcUrl);
         registry.add("spring.datasource.username", sqlContainer::getUsername);
         registry.add("spring.datasource.password", sqlContainer::getPassword);
@@ -63,15 +60,14 @@ public class EmployeeTest {
         employeeRepository.deleteAll();
         if(!testInfo.getTags().contains("SkipSeedingData"))
         {
-            List<Employee> seedEmployees = new ArrayList<>();
-            seedEmployees.add(Employee.builder().id(1L).age(22).organizationId(1L).departmentId(1L).name("John").position("student").build());
-            seedEmployees.add(Employee.builder().id(2L).age(35).organizationId(1L).departmentId(1L).name("Piet").position("teacher").build());
-            seedEmployees.add(Employee.builder().id(3L).age(32).organizationId(1L).departmentId(2L).name("Luc").position("teacher").build());
-            seedEmployees.add(Employee.builder().id(4L).age(21).organizationId(2L).departmentId(1L).name("Jef").position("student").build());
-            seedEmployees.add(Employee.builder().id(5L).age(20).name("Lisa").position("student").build());
-            seedEmployees.add(Employee.builder().id(6L).organizationId(2L).departmentId(3L).build());
-
-            employeeRepository.saveAll(seedEmployees);
+            employeeRepository.saveAll(List.of(
+                Employee.builder().id(1L).age(22).organizationId(1L).departmentId(1L).name("John").position("student").build(),
+                Employee.builder().id(2L).age(35).organizationId(1L).departmentId(1L).name("Piet").position("teacher").build(),
+                Employee.builder().id(3L).age(32).organizationId(1L).departmentId(2L).name("Luc").position("teacher").build(),
+                Employee.builder().id(4L).age(21).organizationId(2L).departmentId(1L).name("Jef").position("student").build(),
+                Employee.builder().id(5L).age(20).name("Lisa").position("student").build(),
+                Employee.builder().id(6L).organizationId(2L).departmentId(3L).build()
+            ));
         }
     }
 
@@ -96,25 +92,11 @@ public class EmployeeTest {
         //TODO: add test for wrong entry
     }
 
-
-    //Todo: QUESTION: Waarom is de test groen als ik deze apart run en rood als ik ze allemaal via de class run?
     @Test
     public  void testGetEmployees() throws Exception {
-        List<Employee> seedEmployees = employeeRepository.findAll();
+        List<Employee> expectedEmployees = employeeRepository.findAll();
 
-        List<EmployeeResponse> employeeResponses = new ArrayList<>();
-        for (Employee employee : seedEmployees) {
-            employeeResponses.add(EmployeeResponse.builder()
-                    .id(employee.getId())
-                    .age(employee.getAge())
-                    .name(employee.getName())
-                    .position(employee.getPosition())
-                    .departmentId(employee.getDepartmentId())
-                    .organizationId(employee.getOrganizationId())
-                    .build()
-            );
-        }
-        //TODO: QUESTION: Mag de service gemocked worden of moet de Testcontainer DB gebruikt worden met de repository?
+        //TODO: QUESTION: Moet de service gemocked worden of is het beter om de Testcontainer DB te gebruiken met de repository?
         //when(employeeService.getAllEmployees()).thenReturn(employeeResponses);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee")
@@ -123,47 +105,40 @@ public class EmployeeTest {
                 .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
-        List<EmployeeResponse> responseEmployees = objectMapper.readValue(responseContent, new TypeReference<List<EmployeeResponse>>() {
+        List<Employee> actualEmployees = objectMapper.readValue(responseContent, new TypeReference<>() {
         });
 
-        assertEquals(employeeResponses, responseEmployees);
+        assertEquals(expectedEmployees, actualEmployees);
     }
 
+    //Todo: QUESTION: Waarom is de test groen als ik deze apart run en rood als ik ze allemaal via de class run?
+    // Om één of reden kent het systeem tijden de setup voor de ids andere waardes toe. Ik heb niet kunnen vinden waar het aan ligt.
     @Test
     public  void testGetEmployeeById() throws Exception {
+        Long existingEmployeeId = 3L;
         List<Employee> employees = employeeRepository.findAll();
-        Long employeeId = 3L;
-        Employee employee = employees.stream().filter(e -> e.getId().equals(employeeId)).findFirst().get();
-
-        EmployeeResponse employeeResponse = EmployeeResponse.builder()
-                .id(employee.getId())
-                .age(employee.getAge())
-                .name(employee.getName())
-                .position(employee.getPosition())
-                .departmentId(employee.getDepartmentId())
-                .organizationId(employee.getOrganizationId())
-                .build();
+        Employee expectedEmployee = (Employee) employees.get(2);
 
         // test for id that exists
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + employeeId)
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + existingEmployeeId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
-        EmployeeResponse responseEmployee = objectMapper.readValue(responseContent, new TypeReference<EmployeeResponse>() {
-        });
+        Employee actualEmployee = objectMapper.readValue(responseContent, new TypeReference<>() {});
 
-        assertEquals(employeeResponse, responseEmployee);
+        assertEquals(expectedEmployee, actualEmployee);
 
         // test for non existing id
         Long nonExistingEmployeeId = 99L;
-        MvcResult resultNotExistId = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + nonExistingEmployeeId)
+        String expectedErrorMessage = "Employee with id " + nonExistingEmployeeId + " not found!";
+        MvcResult resultNotExistingId = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/" + nonExistingEmployeeId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andReturn();
-        String responseNotExistIdContent = resultNotExistId.getResponse().getErrorMessage();
-        assertEquals("Employee with id " + nonExistingEmployeeId + " not found!", responseNotExistIdContent);
+        String actualErrorMessage = resultNotExistingId.getResponse().getErrorMessage();
+        assertEquals(expectedErrorMessage, actualErrorMessage);
 
     }
 
@@ -173,39 +148,41 @@ public class EmployeeTest {
 
         //test for departments with employees
         Long departmentId = 1L;
-        List<EmployeeResponse> expectedEmployees = new ArrayList<>();
-        expectedEmployees.add(mapEmployeeToEmployeeResponse(employees.get(0)));
-        expectedEmployees.add(mapEmployeeToEmployeeResponse(employees.get(1)));
-        expectedEmployees.add(mapEmployeeToEmployeeResponse(employees.get(3)));
+        List<Employee> expectedEmployees = new ArrayList<>();
+        expectedEmployees.add(employees.get(0));
+        expectedEmployees.add(employees.get(1));
+        expectedEmployees.add(employees.get(3));
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/department/" + departmentId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         String responseContent = result.getResponse().getContentAsString();
-        List<EmployeeResponse> employeesResponse = objectMapper.readValue(responseContent, new TypeReference<List<EmployeeResponse>>() {});
-        assertEquals(expectedEmployees, employeesResponse, "Should return only the employees in the department.");
+        List<Employee> actualEmployees = objectMapper.readValue(responseContent, new TypeReference<>() {});
+        assertEquals(expectedEmployees, actualEmployees, "Should return only the employees in the department.");
 
-        //ToDo: Add test for non existing departmentId
+        //Test for non existing departmentId
         Long nonExistingDepartmentId = 99L;
+        String expectedErrorMessage = "No employees with department id " + nonExistingDepartmentId + " found!";
         MvcResult resultNonExistingDepartmentId = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/department/" + nonExistingDepartmentId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andReturn();
-        String responseResultNonExistingDepartmentIdContent = resultNonExistingDepartmentId.getResponse().getErrorMessage();
-        assertEquals("No employees with department id " + nonExistingDepartmentId + " found!", responseResultNonExistingDepartmentIdContent, "A wrong deparmentId should return a Not Found status code!");
+        String actualErrorMessage = resultNonExistingDepartmentId.getResponse().getErrorMessage();
+        assertEquals(expectedErrorMessage, actualErrorMessage, "A wrong deparmentId should return a Not Found status code!");
 
     }
 
     @Test
     public void testGetEmployeesByOrganizationId() throws Exception {
-        //ToDo: Add test for existing organizationId
+        //Test for existing organizationId
         List<Employee> employees = employeeRepository.findAll();
         Long organizationId = 1L;
-        List<EmployeeResponse> employeesResponseExpected = Arrays.asList(
-                mapEmployeeToEmployeeResponse(employees.get(0)),
-                mapEmployeeToEmployeeResponse(employees.get(1)),
-                mapEmployeeToEmployeeResponse(employees.get(2)));
+        List<Employee> expectedEmployees = Arrays.asList(
+                employees.get(0),
+                employees.get(1),
+                employees.get(2)
+        );
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/organization/" + organizationId)
             .contentType(MediaType.APPLICATION_JSON))
@@ -213,30 +190,17 @@ public class EmployeeTest {
                 .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
-        List<EmployeeResponse> employeeResponse = objectMapper.readValue(responseContent, new TypeReference<List<EmployeeResponse>>() {});
-        assertEquals(employeesResponseExpected, employeeResponse);
-        //ToDo: Add test for non existing organizationId
+        List<Employee> actualEmployees = objectMapper.readValue(responseContent, new TypeReference<>() {});
+        assertEquals(expectedEmployees, actualEmployees);
 
+        //Test for non existing organizationId
         Long nonExistingOrganizationId = 99L;
+        String expectedErrorMessage = "No employees found with organisation id " + nonExistingOrganizationId + "!";
         result = mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/organization/" + nonExistingOrganizationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andReturn();
-        String errorMessageNotExistingOrganizationId = result.getResponse().getErrorMessage();
-        assertEquals("No employees found with organisation id " + nonExistingOrganizationId + "!", errorMessageNotExistingOrganizationId);
+        String actualErrorMessage = result.getResponse().getErrorMessage();
+        assertEquals(expectedErrorMessage, actualErrorMessage);
     }
-
-
-    //Helper function
-    private EmployeeResponse mapEmployeeToEmployeeResponse(Employee employee) {
-        return EmployeeResponse.builder()
-                .id(employee.getId())
-                .age(employee.getAge())
-                .name(employee.getName())
-                .position(employee.getPosition())
-                .departmentId(employee.getDepartmentId())
-                .organizationId(employee.getOrganizationId())
-                .build();
-    }
-
 }
