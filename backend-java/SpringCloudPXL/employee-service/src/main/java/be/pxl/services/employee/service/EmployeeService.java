@@ -1,4 +1,4 @@
-package be.pxl.services.employee.services;
+package be.pxl.services.employee.service;
 
 import be.pxl.services.employee.domain.Employee;
 import be.pxl.services.employee.domain.dto.EmployeeRequest;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

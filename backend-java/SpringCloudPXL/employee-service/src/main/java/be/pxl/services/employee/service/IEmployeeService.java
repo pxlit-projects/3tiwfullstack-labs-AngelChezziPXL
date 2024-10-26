@@ -1,4 +1,4 @@
-package be.pxl.services.employee.services;
+package be.pxl.services.employee.service;
 
 import be.pxl.services.employee.domain.dto.EmployeeRequest;
 import be.pxl.services.employee.domain.dto.EmployeeResponse;
