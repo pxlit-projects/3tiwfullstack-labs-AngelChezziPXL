@@ -1,6 +1,8 @@
 package be.pxl.services.employee.controller;
 
+import be.pxl.services.employee.client.NotificationClient;
 import be.pxl.services.employee.domain.dto.EmployeeRequest;
+import be.pxl.services.employee.domain.dto.NotificationRequest;
 import be.pxl.services.employee.services.IEmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,11 +15,18 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
 
     private final IEmployeeService employeeService;
+    private final NotificationClient notificationClient;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void addEmployee(@RequestBody EmployeeRequest employeeRequest) {
         employeeService.addEmployee(employeeRequest);
+
+        NotificationRequest notificationRequest = NotificationRequest.builder()
+                .message("Employee Created")
+                .to("Angel")
+                .build();
+        notificationClient.sendNotification(notificationRequest);
     }
 
     @GetMapping
