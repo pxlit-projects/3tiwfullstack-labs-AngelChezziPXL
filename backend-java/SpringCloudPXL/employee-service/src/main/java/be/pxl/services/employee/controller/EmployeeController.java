@@ -2,12 +2,15 @@ package be.pxl.services.employee.controller;
 
 import be.pxl.services.employee.client.NotificationClient;
 import be.pxl.services.employee.domain.dto.EmployeeRequest;
+import be.pxl.services.employee.domain.dto.EmployeeResponse;
 import be.pxl.services.employee.domain.dto.NotificationRequest;
-import be.pxl.services.employee.services.IEmployeeService;
+import be.pxl.services.employee.service.IEmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -30,8 +33,8 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity getEmployees() {
-        return new ResponseEntity(employeeService.getAllEmployees(), HttpStatus.OK);
+    public ResponseEntity<List<EmployeeResponse>> getEmployees() {
+        return new ResponseEntity<>(employeeService.getAllEmployees(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
