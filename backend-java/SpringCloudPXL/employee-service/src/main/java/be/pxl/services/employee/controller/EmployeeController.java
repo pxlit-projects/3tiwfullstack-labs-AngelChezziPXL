@@ -43,15 +43,16 @@ public class EmployeeController {
     }
 
     @GetMapping("/department/{departmentId}")
-    public ResponseEntity getEmployeesByDepartmentId(@PathVariable Long departmentId) {
-        return new ResponseEntity(employeeService.findByDepartmentId(departmentId), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public List<EmployeeResponse> getEmployeesByDepartmentId(@PathVariable Long departmentId) {
+        return employeeService.findByDepartmentId(departmentId);
     }
 
     @GetMapping("/organization/{organizationId}")
-    public ResponseEntity getEmployeesByOrganizationId(@PathVariable Long organizationId) {
-        return new ResponseEntity(employeeService.findByOrganizationId(organizationId), HttpStatus.OK);
+    public ResponseEntity<List<EmployeeResponse>> getEmployeesByOrganizationId(@PathVariable Long organizationId) {
+        return new ResponseEntity<>(employeeService.findByOrganizationId(organizationId), HttpStatus.OK);
     }
 
-
+    // TODO: QUESTION: Must all responses be mapped to dto (EmployeeResponse)?
 
 }
