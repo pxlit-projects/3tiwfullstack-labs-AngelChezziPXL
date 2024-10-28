@@ -1,9 +1,12 @@
 package be.pxl.services.department.services;
 
+import be.pxl.services.department.client.EmployeeClient;
 import be.pxl.services.department.domain.Department;
+import be.pxl.services.department.domain.Employee;
 import be.pxl.services.department.domain.dto.DepartmentRequest;
 import be.pxl.services.department.domain.dto.DepartmentResponse;
 import be.pxl.services.department.repository.DepartmentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DepartmentService implements IDepartmentService {
     private final DepartmentRepository departmentRepository;
+
+    private final EmployeeClient employeeClient;
 
     @Override
     public List<DepartmentResponse> findAll() {
@@ -45,6 +50,15 @@ public class DepartmentService implements IDepartmentService {
                 //.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found"));
         if(departments == null || departments.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found");
+        }
+
+        List<Employee> employees = employeeClient.getEmployeesByOrganizationId(organizationId);
+
+        for(var department : departments) {
+            List<Employee> employeesByDepartment = employees.stream()
+                    .filter(e -> e.getDepartmentId() == department.getId())
+                    .toList();
+            department.setEmployees(employeesByDepartment);
         }
         return  departments.stream().map((this::mapToDepartmentResponse)).toList();
     }
