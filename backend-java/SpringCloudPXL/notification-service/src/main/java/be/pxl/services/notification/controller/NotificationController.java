@@ -18,6 +18,7 @@ public class NotificationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    //TODO: QUESTION: Moet dit geen NotificationRequest zijn?
     public  void sendMessage(@RequestBody Notification notification) {
         notificationService.sendMessage(notification);
     }
